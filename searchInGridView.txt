@@ -1,0 +1,37 @@
+  <script>
+
+        function searchGridView() {
+            debugger;
+            var searchText = document.getElementById('<%=txtserch1.ClientID %>').value;
+            var searchTextArray = searchText.split(" ")
+            var gridView = document.getElementById('<%=GridView1.ClientID %>');
+            for (var i = 1; i < gridView.rows.length; i++) {
+                var row = gridView.rows[i];
+            var cells = row.cells;
+            var isExists=searchTextArray.every(val => {
+                for (let j = 1; j < row.cells.length; j++) {
+                    console.log(cells[j].childNodes[1].innerHTML.toLowerCase());
+                    if (cells[j].childNodes[1].innerHTML.toLowerCase().indexOf(val.toLowerCase()) >= 0) {
+                        return true;
+                    }
+
+                    
+                }
+            })
+
+            if (isExists) {
+                row.style.display = '';
+              
+            }
+            else {
+                row.style.display = 'none';
+            }
+             
+            }
+            return false;
+        }
+
+        function AllScript() {
+            MUltiSelect()
+        }
+    </script>
