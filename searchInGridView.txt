@@ -35,3 +35,32 @@
             MUltiSelect()
         }
     </script>
+
+<script>
+ searchGridView(data:string) {
+  let searchText = data;
+  let searchTextArray = searchText.split(" ")
+  for (let i = 0; i < this.gridView.rows.length; i++) {
+      let row = this.gridView.rows[i];
+  let cells = row.cells;
+  
+  let isExists=searchTextArray.every((val:any):any => {
+    console.log(cells[0].childNodes[0].data);
+      for (let j = 0; j < row.cells.length; j++) {
+          console.log(cells[j].childNodes[0].data,val);
+          if (cells[j].childNodes[0].data.toLowerCase().indexOf(val.toLowerCase()) >= 0) {
+              return true;
+          }
+      }
+  })
+  if (isExists) {
+      row.style.display = '';
+  }
+  else {
+      row.style.display = 'none';
+  }
+   
+  }
+}
+
+</script>
