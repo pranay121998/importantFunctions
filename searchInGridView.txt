@@ -166,3 +166,1864 @@
             return fileResult;
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+function PrintReport(id, rollno) {
+    debugger
+    var termid = $("#TermID").val();
+    localStorage.setItem("StudentId", id);
+    const randomString = generateRandomString(10);
+    var url = '/Exam/PrintReportCard?id=' + randomString;
+    //var url = '@Url.Action("PrintReportCard", "Exam",new { id = "__id__" })';
+    var arr = [];
+    var obj = {
+        rollno: rollno,
+        StudentId: parseInt(id)
+    };
+    arr.push(obj);
+    localStorage.setItem("PrintIds", JSON.stringify(arr));
+    localStorage.setItem("PrintTerm", termid);
+    window.open(url, "_blank");
+    // window.open(url);
+}
+$(document).ready(function () {
+    localStorage.setItem("PrintIds", "");
+    localStorage.setItem("PrintTerm", "");
+    var dataTable;
+    // $("#TableStudent").DataTable();
+    $("#BtnShowReportStudent").on('click', function () {
+        var classid = $("#ClassID").val();
+        var sectionid = $("#SectionId").val();
+        var fields = [
+            { id: "#ClassID", name: "Class" },
+            { id: "#SectionId", name: "Section" },
+            { id: "#TermID", name: "Term" }
+        ];
+        var missingField = "";
+
+        for (var i = 0; i < fields.length; i++) {
+            var fieldValue = $(fields[i].id).val();
+            if (fieldValue === '0') {
+                missingField = fields[i].name;
+                break;
+            }
+        }
+
+        if (missingField !== "") {
+            alert("Please select a " + missingField + ".");
+        }
+        else {
+            if (!dataTable) {
+                dataTable = $('#TableStudent').DataTable({
+                    columns: [
+                        { title: 'SNo' },
+                        { title: 'Student Name' },
+                        { title: 'Class' },
+                        { title: 'Section' },
+                        { title: 'Actions' }
+                    ]
+                });
+            }
+            $.ajax({
+                url: "/Exam/GetStudentByClassSection",
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json;charset=UTF-8",
+                data: { classId: classid, sectionId: sectionid, testId: 1 },
+                success: function (result) {
+                    var data = [];
+                    var serialNo = 1;
+                    $.each(result, function (key, item) {
+                        data.push([
+                            serialNo,
+                            item.StudentName,
+                            item.ClassName,
+                            item.SectionName,
+                            '<button class="btn btn-primary" onclick="PrintReport(' + item.StudentId + ', ' + serialNo + ')">Print</button>'
+
+                        ]);
+                        serialNo++;
+                    });
+                    dataTable.clear().rows.add(data).draw();
+                },
+                error: function (errormessage) {
+                    console.log("Error:", errormessage); // Log any error message
+                    alert(errormessage.responseText);
+                }
+            });
+
+        }
+
+    });
+
+    $("#BtnPrintAll").on('click', function () {
+        let serialNumbers = [];
+        var count = 1;
+        var classid = $("#ClassID").val();
+        var sectionid = $("#SectionId").val();
+        var fields = [
+            { id: "#ClassID", name: "Class" },
+            { id: "#SectionId", name: "Section" },
+            { id: "#TermID", name: "Term" }
+        ];
+        var missingField = "";
+
+        for (var i = 0; i < fields.length; i++) {
+            var fieldValue = $(fields[i].id).val();
+            if (fieldValue === '0') {
+                missingField = fields[i].name;
+                break;
+            }
+        }
+
+        if (missingField !== "") {
+            alert("Please select a " + missingField + ".");
+        }
+        else {
+            $.ajax({
+                url: "/Exam/GetStudentByClassSection",
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json;charset=UTF-8",
+                data: { classId: classid, sectionId: sectionid, testId: 1 },
+                success: function (result) {
+                    console.log(result)
+                    $.each(result, function (key, data) {
+                        //if (count < 5) {
+                        var obj = {
+                            rollno: count,
+                            StudentId: data.StudentId
+                        };
+                        serialNumbers.push(obj);
+                        count++;  // Increment the counter
+                        // }
+                    }
+                    );
+                    var termid = $("#TermID").val();
+                    localStorage.setItem("PrintTerm", termid);
+                    localStorage.setItem('PrintIds', JSON.stringify(serialNumbers));
+                    const randomString = generateRandomString(10);
+                    var url = '/Exam/PrintReportCard?id=' + randomString;
+                    window.open(url, "_blank");
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+    });
+
+
+    $("#BtnDownloadAll").on('click', function () {
+        let serialNumbers = [];
+        var count = 1;
+        var classid = $("#ClassID").val();
+        var sectionid = $("#SectionId").val();
+        var fields = [
+            { id: "#ClassID", name: "Class" },
+            { id: "#SectionId", name: "Section" },
+            { id: "#TermID", name: "Term" }
+        ];
+        var missingField = "";
+
+        for (var i = 0; i < fields.length; i++) {
+            var fieldValue = $(fields[i].id).val();
+            if (fieldValue === '0') {
+                missingField = fields[i].name;
+                break;
+            }
+        }
+
+        if (missingField !== "") {
+            alert("Please select a " + missingField + ".");
+        }
+        else {
+            $.ajax({
+                url: "/Exam/GetStudentByClassSection",
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json;charset=UTF-8",
+                data: { classId: classid, sectionId: sectionid, testId: 1 },
+                success: function (result) {
+                    console.log(result)
+                    $.each(result, function (key, data) {
+                        //if (count < 5) {
+                        var obj = {
+                            rollno: count,
+                            StudentId: data.StudentId
+                        };
+                        serialNumbers.push(obj);
+                        count++;  // Increment the counter
+                        // }
+                    }
+                    );
+                    var termid = $("#TermID").val();
+                    localStorage.setItem("PrintTerm", termid);
+                    localStorage.setItem('PrintIds', JSON.stringify(serialNumbers));
+                    const randomString = generateRandomString(10);
+                    var url = '/Exam/PrintReportCard?id=' + randomString;
+                    //window.open(url, "_blank");
+                    // function loadOtherPage() {
+
+                    //$("<iframe>").attr("id", "frame")              // create a new iframe element
+                    //    //.hide()                               // make it invisible
+                    //    .attr("src", url) // point the iframe to the page you want to print
+                    //    .appendTo($(".IFrameClass"));                    // add iframe to the DOM to cause it to load the page
+
+
+
+
+
+                    callReportPDF();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+    });
+});
+
+
+function CallPrint() {
+    var prtContent = document.getElementById('main');
+    var WinPrint = window.open('', '', 'width=800,height=650,scrollbars=1,menuBar=1');
+    var str = prtContent.innerHTML;
+    WinPrint.document.write(str);
+    WinPrint.document.close();
+    WinPrint.focus();
+}
+function generateRandomString(length) {
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomString = '';
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomString += characters.charAt(randomIndex);
+    }
+
+    return randomString;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var gradingCriteria = [];
+async function fetchData(rollno, number) {
+
+    $("#UnitTestRemark").hide();
+    fetch('/Exam/AllGrade', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            gradingCriteria = data;
+        })
+        .catch(error => {
+            return "";
+            console.log("API call failed: " + error);
+        });
+
+
+    var studentName = "";
+    var studentID = "";
+    // Get the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get the value of the "id" parameter
+    const id = urlParams.get('id');
+    const TermId = localStorage.getItem("PrintTerm");
+
+
+
+
+    const selectedValue = TermId;
+    const splitValues = splitValue(selectedValue);
+
+
+    if (splitValues) {
+
+        if (splitValues.name === "UT") {
+            $("#UnitName").text(splitValues.id);
+
+            $("#UnitRecord").show();
+            $("#MarksTable").hide();
+            $("#TermRecord").hide();
+            $("#PreBoardRecord").hide();
+            $("#coScholasticTable").hide();
+            // $("#coScholasticPreBoardTable").hide();
+        }
+        else if (splitValues.name === "Term") {
+            $(".ft15").css("font-size", "11px");
+            $("#TermName").text(splitValues.id == "3" ? "1" : "2");
+            $("#UnitRecord").hide();
+            $("#MarksTable").hide();
+            $("#TermRecord").show();
+            $("#PreBoardRecord").hide();
+            $("#coScholasticTable").show();
+            //$("#coScholasticPreBoardTable").hide();
+            if (splitValues.id == 3) {
+                $(".headerTerm1Column").show();
+                $(".headerTerm2Column").hide();
+            } else {
+                $(".headerTerm1Column").hide();
+                $(".headerTerm2Column").show();
+            }
+            $(".headerPreBoard1Column").hide();
+            $(".headerPreBoard2Column").hide();
+
+        }
+        else if (splitValues.name === "PreBoard") {
+            $(".ft15").css("font-size", "11px");
+            $("#PreBoardTermName").text(splitValues.id == "7" ? "1" : "2");
+            $("#UnitRecord").hide();
+            $("#MarksTable").hide();
+            $("#TermRecord").hide();
+            $("#PreBoardRecord").show();
+            $("#coScholasticTable").show();
+            $(".headerTerm1Column").hide();
+            $(".headerTerm2Column").hide();
+            //$("#coScholasticPreBoardTable").show()
+            if (splitValues.id == 7) {
+
+                $(".headerPreBoard1Column").show();
+                $(".headerPreBoard2Column").hide();
+
+            } else {
+                $(".headerPreBoard1Column").hide();
+                $(".headerPreBoard2Column").show();
+            }
+
+        }
+        else if (splitValues.name === "All") {
+            // $("#TermName").text(splitValues.id == "3" ? "1" : "2");
+            $("#UnitRecord").hide();
+            $("#MarksTable").show();
+            $("#TermRecord").hide();
+            $("#coScholasticTable").show();
+            $("#teacherRemark").show();
+            $("#UnitTestRemark").hide();
+
+            $("#PreBoardRecord").hide();
+            //$("#coScholasticPreBoardTable").hide()
+
+
+        }
+
+
+    }
+    //New
+    fetch('/Exam/PrintReportCardData?studentId=' + number + '&termId=' + parseInt(splitValues.id), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            ;
+            if (data.subjectDatas && Array.isArray(data.subjectDatas)) {
+                var subjectDatas = data.subjectDatas;
+                var tableBody = document.getElementById('MarksTable').getElementsByTagName('tbody')[0];
+                $(".Term1TheoryMaxMarkTotal").text("(" + data.totalResult.Term1TheoryMaxTotal + ")");
+                $("#Term1PracticalMaxMarkTotal").text("(" + data.totalResult.Term1PracticalMaxTotal + ")");
+                $("#Term2TheoryMaxMarkTotal").text("(" + data.totalResult.Term2TheoryMaxTotal + ")");
+                $("#Term2PracticalMaxMarkTotal").text("(" + data.totalResult.Term2PracticalMaxTotal + ")");
+                $("#UT1MaxMarkTotal").text("(" + data.totalResult.UT1MaxTotal + ")");
+                $("#UT2MaxMarkTotal").text("(" + data.totalResult.UT2MaxTotal + ")");
+                $("#UTTotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.UT2MaxTotal) + parseInt(data.totalResult.UT1MaxTotal)) + ")");
+                $("#Term1TotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.Term1TheoryMaxTotal) + parseInt(data.totalResult.Term1PracticalMaxTotal)) + ")");
+                $("#Term2TotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.Term2TheoryMaxTotal) + parseInt(data.totalResult.Term2PracticalMaxTotal)) + ")");
+                // Get all rows from the table body
+                var rows = tableBody.getElementsByTagName('tr');
+
+                // Skip the first two rows and remove the rest
+                for (var i = rows.length - 1; i >= 2; i--) {
+                    tableBody.removeChild(rows[i]);
+                }
+                $("#StudentName").text(data.studentName);
+                $("#FatherName").text(data.fatherName);
+                $("#MotherName").text(data.motherName);
+                $("#AcademicYear").text(data.academicYear);
+                $("#ScholarNo").text(data.scholarNo);
+                $("#DateOfBirth").text(data.dateOfBirth);
+                $("#RollNo").text(rollno);
+                $("#ClassSection").text(data.className + "(" + data.sectionName + ")");
+                const allowedClassIds = [414, 415, 416, 417]; // List of allowed class IDs
+
+                if (allowedClassIds.includes(data.classID)) {
+                    $("#ClassSection").text("(" + data.className + ")");
+                } else {
+                    $("#ClassSection").text(data.className + "(" + data.sectionName + ")");
+                }
+
+                $("#Attendance").text(data.attandence); // Check the checkbox
+                var imageUrl = "/WebsiteImages/StaffSignature/" + data.staffSignatureLink;
+
+                // Set the src attribute of the image element using jQuery
+                $("#teachersignature").attr("src", imageUrl);
+                //var UT1Total = 0;
+                //var UT2Total = 0;
+                //var UTAllTotal = 0;
+                //var TheoryTotalT1 = 0;
+                //var PracticalTotalT1 = 0;
+                //var T1AllTotal = 0;
+                //var TheoryTotalT2 = 0;
+                //var PracticalTotalT2 = 0;
+                //var T2AllTotal = 0;
+                //var OverallAllTotal = 0;
+
+
+                //all data Term1 term2, unit1,unit2
+                subjectDatas.forEach(subjectData => {
+                    var newRow = document.createElement('tr');
+
+                    // Create the "subject" <td> with "scope" and "class" attributes
+                    var subjectTd = document.createElement('td');
+                    subjectTd.textContent = subjectData.Subject;
+                    subjectTd.setAttribute('scope', 'row');
+                    subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                    newRow.appendChild(subjectTd);
+
+                    // Add the data to the respective <td> elements
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.MarksUT1) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.MarksUT2) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.TotalMarks) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.TheoryMarks) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.PracticalMarks) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.TotalObtainedMarks) + '</td>';
+                    newRow.innerHTML += '<td>' + subjectData.GradeUT1 + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.TheoryMarksUT2) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.PracticalMarksUT2) + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.TotalObtainedMarksUT2) + '</td>';
+                    newRow.innerHTML += '<td>' + subjectData.GradeUT2 + '</td>';
+                    newRow.innerHTML += '<td>' + checkForZero(subjectData.TotalMarksBothUTs) + '</td>';
+                    newRow.innerHTML += '<td>' + subjectData.FinalGrade + '</td>';
+
+                    tableBody.appendChild(newRow);
+                });
+                // Add the row for the total
+                var totalRow = document.createElement('tr');
+
+                // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                var totalTd = document.createElement('td');
+                totalTd.textContent = 'Total';
+                totalTd.setAttribute('scope', 'row');
+                totalTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                totalTd.style.fontWeight = 'bold';
+                totalRow.appendChild(totalTd);
+                // Add the data to the respective <td> elements using <b> tags for bold text
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.UT1Total) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.UT2Total) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.UTAllTotal) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.TheoryTotalT1) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.PracticalTotalT1) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.T1AllTotal) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + data.totalResult.T1Grade + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.TheoryTotalT2) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.PracticalTotalT2) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.T2AllTotal) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + data.totalResult.T2Grade + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + checkForZero(data.totalResult.OverallAllTotal) + '</b></td>';
+                totalRow.innerHTML += '<td><b>' + data.totalResult.OverallGrade + '</b></td>';
+                tableBody.appendChild(totalRow);
+
+                //additional rows
+                // Add the additional rows for percentages and other subjects
+                ;
+
+                var percentagesRow = createAdditionalRow("Percentage", data.totalResultPercentage.UT1Total + "%",
+                    data.totalResultPercentage.UT2Total + "%",
+                    data.totalResultPercentage.UTAllTotal + "%",
+                    data.totalResultPercentage.TheoryTotalT1 + "%",
+                    data.totalResultPercentage.PracticalTotalT1 + "%",
+                    data.totalResultPercentage.T1AllTotal + "%",
+                    data.totalResultPercentage.T1Grade,
+                    data.totalResultPercentage.TheoryTotalT2 + "%",
+                    data.totalResultPercentage.PracticalTotalT2 + "%",
+                    data.totalResultPercentage.T2AllTotal + "%",
+                    data.totalResultPercentage.T2Grade,
+                    data.totalResultPercentage.OverallAllTotal + "%",
+                    data.totalResultPercentage.OverallGrade, true
+                );
+                tableBody.appendChild(percentagesRow);
+
+                $("#overallGrade").text(data.totalResultPercentage.OverallGrade);
+                $("#teacherRemarkText").text(data.Remark);
+                // if (parseFloat(data.totalResultPercentage.OverallAllTotal) < 33) {
+                if ($("#overallGrade").text() === '') {
+                    $("#result").text("");
+
+
+                } else {
+                    $("#result").text("Pass");
+                    $("#promotedClass").text(data.promotedClass);
+
+                }
+                if ($.inArray('D', subjectDatas) != -1) {
+                    $("#result").text("");
+                }
+                data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                    var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject, checkForZero(optionalSubjectData.MarksUT1), optionalSubjectData.MarksUT1Grade, checkForZero(optionalSubjectData.MarksUT2), optionalSubjectData.MarksUT2Grade, " ", checkForZero(optionalSubjectData.TheoryMarks), checkForZero(optionalSubjectData.PracticalMarks), checkForZero(optionalSubjectData.TotalObtainedMarks), optionalSubjectData.GradeUT1, checkForZero(optionalSubjectData.TheoryMarksUT2), checkForZero(optionalSubjectData.PracticalMarksUT2), checkForZero(optionalSubjectData.TotalObtainedMarksUT2), optionalSubjectData.GradeUT2, false);
+                    tableBody.appendChild(moralScienceRowUT1);
+                });
+                //var moralScienceRow = createAdditionalRow("Moral Science", "-", "-", "", "-", "-", "-", "-", "-", "-", "-", "-", "", "", false);
+                //tableBody.appendChild(moralScienceRow);
+
+                //var gkRow = createAdditionalRow("G.K", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", false);
+                //tableBody.appendChild(gkRow);
+
+                //var drawingRow = createAdditionalRow("Drawing", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", false);
+                //tableBody.appendChild(drawingRow);
+
+                //var supwRow = createAdditionalRow("SUPW", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", false);
+                //tableBody.appendChild(supwRow);
+                if (splitValues.name === "Term" || splitValues.name === "PreBoard") {
+                    addRows(data.coscholasticAreaDatas, splitValues.id);
+
+                }
+
+                if (splitValues.name === "All") {
+                    addRows(data.coscholasticAreaDatas, 10);
+                }
+                //For Unit 1
+                if (splitValues.id === "1") {
+                    $("#teacherRemark").hide();
+                    $("#UnitTestRemark").show();
+                    $("#UnitTestRemarkText").text(data.Remark);
+                    $("#UTMaxMarkTotal").text("(" + data.totalResult.UT1MaxTotal + ")");
+
+                    var tableBodyUT1 = document.getElementById('UnitRecord').getElementsByTagName('tbody')[0];
+                    // Get all rows from the table body
+                    var rows = tableBodyUT1.getElementsByTagName('tr');
+
+                    // Skip the first two rows and remove the rest
+                    for (var i = rows.length - 1; i >= 2; i--) {
+                        tableBodyUT1.removeChild(rows[i]);
+                    }
+                    subjectDatas.forEach(subjectData => {
+                        var newRowUT1 = document.createElement('tr');
+
+                        // Create the "subject" <td> with "scope" and "class" attributes
+                        var subjectTd = document.createElement('td');
+                        subjectTd.textContent = subjectData.Subject + "(" + subjectData.MaxMarksUT1 + ")";
+                        subjectTd.setAttribute('scope', 'row');
+                        subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                        newRowUT1.appendChild(subjectTd);
+
+                        // Add the data to the respective <td> elements
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.MarksUT1) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + subjectData.MarksUT1Grade + '</td>';
+
+                        tableBodyUT1.appendChild(newRowUT1);
+                    });
+                    // Add the row for the total
+                    var totalRowUT1 = document.createElement('tr');
+
+                    // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                    var totalTdUT1 = document.createElement('td');
+                    totalTdUT1.textContent = 'Total';
+                    totalTdUT1.setAttribute('scope', 'row');
+                    totalTdUT1.setAttribute('class', 'text-uppercase text-start ps-1');
+                    totalTdUT1.style.fontWeight = 'bold';
+                    totalRowUT1.appendChild(totalTdUT1);
+                    // Add the data to the respective <td> elements using <b> tags for bold text
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.UT1Total) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + data.totalResult.UT1TotalGrade + '</b></td>';
+                    tableBodyUT1.appendChild(totalRowUT1);
+
+                    //additional rows
+                    // Add the additional rows for percentages and other subjects
+                    var percentagesRowUT1 = createAdditionalRow("Percentage", data.totalResultPercentage.UT1Total + "%",
+                        data.totalResultPercentage.UT1TotalGrade, true
+                    );
+                    tableBodyUT1.appendChild(percentagesRowUT1);
+                    $("#overallGrade").text(data.totalResult.UT1TotalGrade);
+                    // if (parseFloat(data.totalResultPercentage.UT1Total) < 33) {
+                    if ($("#overallGrade").text() === '') {
+                        $("#result").text("");
+                        //  $("#teacherRemark").hide();
+                    } else {
+                        $("#result").text("Pass");
+                        // $("#promotedClass").text(data.promotedClass);
+
+                    }
+                    data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                        var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject + "(" + optionalSubjectData.MaxMarksUT1 + ")", getOptionMarkGrade(optionalSubjectData.MarksUT1), optionalSubjectData.MarksUT1Grade, false);
+                        tableBodyUT1.appendChild(moralScienceRowUT1);
+                    });
+                    //var moralScienceRowUT1 = createAdditionalRow("Moral Science", "-", "-", false);
+                    //tableBodyUT1.appendChild(moralScienceRowUT1);
+
+                    //var gkRowUT1 = createAdditionalRow("G.K", "-", "-", false);
+                    //tableBodyUT1.appendChild(gkRowUT1);
+
+                    //var drawingRowUT1 = createAdditionalRow("Drawing", "-", "-", false);
+                    //tableBodyUT1.appendChild(drawingRowUT1);
+
+                    //var supwRowUT1 = createAdditionalRow("SUPW", "-", "-", false);
+                    //tableBodyUT1.appendChild(supwRowUT1);
+
+                }
+                //For Unit 2
+                else if (splitValues.id === "2") {
+                    $("#teacherRemark").hide();
+                    $("#UnitTestRemark").show();
+                    $("#UnitTestRemarkText").text(data.Remark);
+                    $("#UTMaxMarkTotal").text("(" + data.totalResult.UT2MaxTotal + ")");
+
+                    var tableBodyUT1 = document.getElementById('UnitRecord').getElementsByTagName('tbody')[0];
+                    // Get all rows from the table body
+                    var rows = tableBodyUT1.getElementsByTagName('tr');
+
+                    // Skip the first two rows and remove the rest
+                    for (var i = rows.length - 1; i >= 2; i--) {
+                        tableBodyUT1.removeChild(rows[i]);
+                    }
+                    subjectDatas.forEach(subjectData => {
+                        var newRowUT1 = document.createElement('tr');
+
+                        // Create the "subject" <td> with "scope" and "class" attributes
+                        var subjectTd = document.createElement('td');
+                        subjectTd.textContent = subjectData.Subject + "(" + subjectData.MaxMarksUT2 + ")";
+                        subjectTd.setAttribute('scope', 'row');
+                        subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                        newRowUT1.appendChild(subjectTd);
+
+                        // Add the data to the respective <td> elements
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.MarksUT2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + subjectData.MarksUT2Grade + '</td>';
+
+                        tableBodyUT1.appendChild(newRowUT1);
+                    });
+                    // Add the row for the total
+                    var totalRowUT1 = document.createElement('tr');
+
+                    // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                    var totalTdUT1 = document.createElement('td');
+                    totalTdUT1.textContent = 'Total';
+                    totalTdUT1.setAttribute('scope', 'row');
+                    totalTdUT1.setAttribute('class', 'text-uppercase text-start ps-1');
+                    totalTdUT1.style.fontWeight = 'bold';
+                    totalRowUT1.appendChild(totalTdUT1);
+                    // Add the data to the respective <td> elements using <b> tags for bold text
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.UT2Total) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + data.totalResult.UT2TotalGrade + '</b></td>';
+                    tableBodyUT1.appendChild(totalRowUT1);
+
+                    //additional rows
+                    // Add the additional rows for percentages and other subjects
+                    var percentagesRowUT1 = createAdditionalRow("Percentage", data.totalResultPercentage.UT2Total + "%",
+                        data.totalResultPercentage.UT2TotalGrade, true
+                    );
+                    tableBodyUT1.appendChild(percentagesRowUT1);
+                    $("#overallGrade").text(data.totalResult.UT2TotalGrade);
+                    //if (parseFloat(data.totalResultPercentage.UT2Total) < 33) {
+                    if ($("#overallGrade").text() === '') {
+                        $("#result").text("");
+                        // $("#teacherRemark").hide();
+                    } else {
+                        $("#result").text("Pass");
+                        //  $("#promotedClass").text(data.promotedClass);
+
+                    }
+                    data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                        var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject, getOptionMarkGrade(optionalSubjectData.MarksUT2), optionalSubjectData.MarksUT2Grade, false);
+                        tableBodyUT1.appendChild(moralScienceRowUT1);
+                    });
+
+                }
+                //For Term 1
+                else if (splitValues.id === "3" && splitValues.name === "Term") {
+                    $("#teacherRemark").hide();
+                    $("#UnitTestRemark").show();
+                    $("#UnitTestRemarkText").text(data.Remark);
+                    $(".Term1TheoryMaxMarkTotal").text("(" + data.totalResult.Term1TheoryMaxTotal + ")");
+                    $("#Term1TPracticalMaxMarkTotal").text("(" + data.totalResult.Term1PracticalMaxTotal + ")");
+                    $("#Term1TAllTotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.Term1TheoryMaxTotal) + parseInt(data.totalResult.Term1PracticalMaxTotal)) + ")");
+
+                    var tableBodyTerm1 = document.getElementById('TermRecord').getElementsByTagName('tbody')[0];
+                    // Get all rows from the table body
+                    var rows = tableBodyTerm1.getElementsByTagName('tr');
+
+                    // Skip the first two rows and remove the rest
+                    for (var i = rows.length - 1; i >= 2; i--) {
+                        tableBodyTerm1.removeChild(rows[i]);
+                    }
+
+                    subjectDatas.forEach(subjectData => {
+
+                        var newRowUT1 = document.createElement('tr');
+
+                        // Create the "subject" <td> with "scope" and "class" attributes
+                        var subjectTd = document.createElement('td');
+                        subjectTd.textContent = subjectData.Subject;
+                        subjectTd.setAttribute('scope', 'row');
+                        subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                        newRowUT1.appendChild(subjectTd);
+
+                        // Add the data to the respective <td> elements
+
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TheoryMarks) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.PracticalMarks) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TotalObtainedMarks) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + subjectData.GradeUT1 + '</td>';
+
+
+                        tableBodyTerm1.appendChild(newRowUT1);
+                    });
+                    // Add the row for the total
+                    var totalRowUT1 = document.createElement('tr');
+
+                    // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                    var totalTdUT1 = document.createElement('td');
+                    totalTdUT1.textContent = 'Total';
+                    totalTdUT1.setAttribute('scope', 'row');
+                    totalTdUT1.setAttribute('class', 'text-uppercase text-start ps-1');
+                    totalTdUT1.style.fontWeight = 'bold';
+                    totalRowUT1.appendChild(totalTdUT1);
+                    // Add the data to the respective <td> elements using <b> tags for bold text
+
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.TheoryTotalT1) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.PracticalTotalT1) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.T1AllTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + data.totalResult.T1Grade + '</b></td>';
+                    tableBodyTerm1.appendChild(totalRowUT1);
+
+                    //additional rows
+                    // Add the additional rows for percentages and other subjects
+                    var percentagesRowUT1 = createAdditionalRow("Percentage",
+                        data.totalResultPercentage.TheoryTotalT1 + "%",
+                        data.totalResultPercentage.PracticalTotalT1 + "%",
+                        data.totalResultPercentage.T1AllTotal + "%",
+                        data.totalResultPercentage.T1Grade, true
+                    );
+                    tableBodyTerm1.appendChild(percentagesRowUT1);
+                    $("#overallGrade").text(data.totalResultPercentage.T1Grade);
+
+                    // if (parseFloat(data.totalResultPercentage.TheoryTotalT1) < 33) {
+                    if ($("#overallGrade").text() === '') {
+                        $("#result").text("");
+                        //$("#teacherRemark").hide();
+                    } else {
+                        $("#result").text("Pass");
+                        // $("#promotedClass").text(data.promotedClass);
+                    }
+                    var isPass = true;
+                    subjectDatas.forEach(subjectData => {
+                        if (subjectData.GradeUT1 === "D") {
+                            isPass = false;
+                        }
+                    });
+                    if (isPass) {
+                        $("#result").text("Pass");
+                    }
+
+                    data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                        var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject, getOptionMarkGrade(optionalSubjectData.TheoryMarks), getOptionMarkGrade(optionalSubjectData.PracticalMarks), getOptionMarkGrade(optionalSubjectData.TotalObtainedMarks), optionalSubjectData.GradeUT1, false);
+                        tableBodyTerm1.appendChild(moralScienceRowUT1);
+                    });
+
+                }
+                else if (splitValues.id === "4" && splitValues.name === "Term") {
+                    $("#teacherRemark").hide();
+                    $("#UnitTestRemark").show();
+                    $("#UnitTestRemarkText").text(data.Remark);
+                    $(".Term1TheoryMaxMarkTotal").text("(" + data.totalResult.Term2TheoryMaxTotal + ")");
+                    $("#Term1TPracticalMaxMarkTotal").text("(" + data.totalResult.Term2PracticalMaxTotal + ")");
+                    $("#Term1TAllTotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.Term2TheoryMaxTotal) + parseInt(data.totalResult.Term2PracticalMaxTotal)) + ")");
+
+                    var tableBodyTerm2 = document.getElementById('TermRecord').getElementsByTagName('tbody')[0];
+                    // Get all rows from the table body
+                    var rows = tableBodyTerm2.getElementsByTagName('tr');
+
+                    // Skip the first two rows and remove the rest
+                    for (var i = rows.length - 1; i >= 2; i--) {
+                        tableBodyTerm2.removeChild(rows[i]);
+                    }
+                    subjectDatas.forEach(subjectData => {
+                        var newRowUT1 = document.createElement('tr');
+
+                        // Create the "subject" <td> with "scope" and "class" attributes
+                        var subjectTd = document.createElement('td');
+                        subjectTd.textContent = subjectData.Subject;
+                        subjectTd.setAttribute('scope', 'row');
+                        subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                        newRowUT1.appendChild(subjectTd);
+
+                        // Add the data to the respective <td> elements
+
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TheoryMarksUT2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.PracticalMarksUT2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TotalObtainedMarksUT2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + subjectData.GradeUT2 + '</td>';
+
+                        tableBodyTerm2.appendChild(newRowUT1);
+                    });
+                    // Add the row for the total
+                    var totalRowUT1 = document.createElement('tr');
+
+                    // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                    var totalTdUT1 = document.createElement('td');
+                    totalTdUT1.textContent = 'Total';
+                    totalTdUT1.setAttribute('scope', 'row');
+                    totalTdUT1.setAttribute('class', 'text-uppercase text-start ps-1');
+                    totalTdUT1.style.fontWeight = 'bold';
+                    totalRowUT1.appendChild(totalTdUT1);
+                    // Add the data to the respective <td> elements using <b> tags for bold text
+
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.TheoryTotalT2) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.PracticalTotalT2) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.T2AllTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + data.totalResult.T2Grade + '</b></td>';
+                    tableBodyTerm2.appendChild(totalRowUT1);
+
+                    //additional rows
+                    // Add the additional rows for percentages and other subjects
+                    var percentagesRowUT1 = createAdditionalRow("Percentage",
+                        data.totalResultPercentage.TheoryTotalT2 + "%",
+                        data.totalResultPercentage.PracticalTotalT2 + "%",
+                        data.totalResultPercentage.T2AllTotal + "%",
+                        data.totalResultPercentage.T2Grade, true
+                    );
+                    tableBodyTerm2.appendChild(percentagesRowUT1);
+                    $("#overallGrade").text(data.totalResultPercentage.T2Grade);
+                    // if (parseFloat(data.totalResultPercentage.TheoryTotalT2) < 33) {
+                    if ($("#overallGrade").text() === '') {
+                        $("#result").text("");
+                        // $("#teacherRemark").hide();
+                    } else {
+                        $("#result").text("Pass");
+                        // $("#promotedClass").text(data.promotedClass);
+
+                    }
+                    data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                        var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject, getOptionMarkGrade(optionalSubjectData.TheoryMarksUT2), getOptionMarkGrade(optionalSubjectData.PracticalMarksUT2), getOptionMarkGrade(optionalSubjectData.TotalObtainedMarksUT2), optionalSubjectData.GradeUT2, false);
+                        tableBodyTerm2.appendChild(moralScienceRowUT1);
+                    });
+
+
+                }
+                else if (splitValues.id === "7" && splitValues.name === "PreBoard") {
+                    ;
+                    $("#teacherRemark").hide();
+                    $("#UnitTestRemark").show();
+                    $("#UnitTestRemarkText").text(data.Remark);
+                    $(".Term1TheoryMaxMarkTotal").text("(" + data.totalResult.Pre1TheoryMaxTotal + ")");
+                    $("#Term1TPracticalMaxMarkTotal").text("(" + data.totalResult.Pre1PracticalMaxTotal + ")");
+                    $("#Term1TAllTotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.Pre1TheoryMaxTotal) + parseInt(data.totalResult.Pre1PracticalMaxTotal)) + ")");
+
+                    var tableBodyPreBoard1 = document.getElementById('PreBoardRecord').getElementsByTagName('tbody')[0];
+                    // Get all rows from the table body
+                    var rows = tableBodyPreBoard1.getElementsByTagName('tr');
+
+                    // Skip the first two rows and remove the rest
+                    for (var i = rows.length - 1; i >= 2; i--) {
+                        tableBodyPreBoard1.removeChild(rows[i]);
+                    }
+                    subjectDatas.forEach(subjectData => {
+                        var newRowUT1 = document.createElement('tr');
+
+                        // Create the "subject" <td> with "scope" and "class" attributes
+                        var subjectTd = document.createElement('td');
+                        subjectTd.textContent = subjectData.Subject;
+                        subjectTd.setAttribute('scope', 'row');
+                        subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                        newRowUT1.appendChild(subjectTd);
+
+                        // Add the data to the respective <td> elements
+
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TheoryMarksPre1) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.PracticalMarksPre1) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TotalObtainedMarksPre1) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + subjectData.GradePre1 + '</td>';
+
+                        tableBodyPreBoard1.appendChild(newRowUT1);
+                    });
+                    // Add the row for the total
+                    var totalRowUT1 = document.createElement('tr');
+
+                    // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                    var totalTdUT1 = document.createElement('td');
+                    totalTdUT1.textContent = 'Total';
+                    totalTdUT1.setAttribute('scope', 'row');
+                    totalTdUT1.setAttribute('class', 'text-uppercase text-start ps-1');
+                    totalTdUT1.style.fontWeight = 'bold';
+                    totalRowUT1.appendChild(totalTdUT1);
+                    // Add the data to the respective <td> elements using <b> tags for bold text
+
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.Pre1TheoryMaxTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.Pre1PracticalMaxTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.Pre1AllTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + data.totalResult.Pre1Grade + '</b></td>';
+                    tableBodyPreBoard1.appendChild(totalRowUT1);
+
+                    //additional rows
+                    // Add the additional rows for percentages and other subjects
+                    var percentagesRowUT1 = createAdditionalRow("Percentage",
+                        data.totalResultPercentage.TheoryTotalPre1 + "%",
+                        data.totalResultPercentage.PracticalTotalPre1 + "%",
+                        data.totalResultPercentage.Pre1AllTotal + "%",
+                        data.totalResultPercentage.Pre1Grade, true
+                    );
+
+                    tableBodyPreBoard1.appendChild(percentagesRowUT1);
+                    $("#overallGrade").text(data.totalResultPercentage.Pre1Grade);
+                    // if (parseFloat(data.totalResultPercentage.TheoryTotalT2) < 33) {
+                    if ($("#overallGrade").text() === '' || $("#overallGrade").text() === 'D') {
+                        $("#result").text("Fail");
+                        // $("#teacherRemark").hide();
+                    } else {
+                        $("#result").text("Pass");
+                        // $("#promotedClass").text(data.promotedClass);
+
+                    }
+                    data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                        var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject, getOptionMarkGrade(optionalSubjectData.TheoryMarksPre1), getOptionMarkGrade(optionalSubjectData.PracticalMarksPre1),
+                            getOptionMarkGrade(optionalSubjectData.TotalObtainedMarksPre1), optionalSubjectData.GradePre1, false);
+                        tableBodyPreBoard1.appendChild(moralScienceRowUT1);
+                    });
+
+
+                }
+                else if (splitValues.id === "8" && splitValues.name === "PreBoard") {
+                    ;
+                    $("#teacherRemark").hide();
+                    $("#UnitTestRemark").show();
+                    $("#UnitTestRemarkText").text(data.Remark);
+                    $(".Term1TheoryMaxMarkTotal").text("(" + data.totalResult.Pre2TheoryMaxTotal + ")");
+                    $("#Term1TPracticalMaxMarkTotal").text("(" + data.totalResult.Pre2PracticalMaxTotal + ")");
+                    $("#Term1TAllTotalMaxMarkTotal").text("(" + (parseInt(data.totalResult.Pre2TheoryMaxTotal) + parseInt(data.totalResult.Pre2PracticalMaxTotal)) + ")");
+
+                    var tableBodyPreBoard1 = document.getElementById('PreBoardRecord').getElementsByTagName('tbody')[0];
+                    // Get all rows from the table body
+                    var rows = tableBodyPreBoard1.getElementsByTagName('tr');
+
+                    // Skip the first two rows and remove the rest
+                    for (var i = rows.length - 1; i >= 2; i--) {
+                        tableBodyPreBoard1.removeChild(rows[i]);
+                    }
+                    subjectDatas.forEach(subjectData => {
+                        var newRowUT1 = document.createElement('tr');
+
+                        // Create the "subject" <td> with "scope" and "class" attributes
+                        var subjectTd = document.createElement('td');
+                        subjectTd.textContent = subjectData.Subject;
+                        subjectTd.setAttribute('scope', 'row');
+                        subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+                        newRowUT1.appendChild(subjectTd);
+
+                        // Add the data to the respective <td> elements
+
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TheoryMarksPre2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.PracticalMarksPre2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + checkForZero(subjectData.TotalObtainedMarksPre2) + '</td>';
+                        newRowUT1.innerHTML += '<td>' + subjectData.GradePre2 + '</td>';
+
+                        tableBodyPreBoard1.appendChild(newRowUT1);
+                    });
+                    // Add the row for the total
+                    var totalRowUT1 = document.createElement('tr');
+
+                    // Create the "Total" <td> with "scope" and "class" attributes and bold font
+                    var totalTdUT1 = document.createElement('td');
+                    totalTdUT1.textContent = 'Total';
+                    totalTdUT1.setAttribute('scope', 'row');
+                    totalTdUT1.setAttribute('class', 'text-uppercase text-start ps-1');
+                    totalTdUT1.style.fontWeight = 'bold';
+                    totalRowUT1.appendChild(totalTdUT1);
+                    // Add the data to the respective <td> elements using <b> tags for bold text
+
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.Pre2TheoryMaxTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.Pre2PracticalMaxTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + checkForZero(data.totalResult.Pre2AllTotal) + '</b></td>';
+                    totalRowUT1.innerHTML += '<td><b>' + data.totalResult.Pre2Grade + '</b></td>';
+                    tableBodyPreBoard1.appendChild(totalRowUT1);
+
+                    //additional rows
+                    // Add the additional rows for percentages and other subjects
+                    var percentagesRowUT1 = createAdditionalRow("Percentage",
+                        data.totalResultPercentage.TheoryTotalPre2 + "%",
+                        data.totalResultPercentage.PracticalTotalPre2 + "%",
+                        data.totalResultPercentage.Pre2AllTotal + "%",
+                        data.totalResultPercentage.Pre2Grade, true
+                    );
+
+                    tableBodyPreBoard1.appendChild(percentagesRowUT1);
+                    $("#overallGrade").text(data.totalResultPercentage.Pre2Grade);
+                    // if (parseFloat(data.totalResultPercentage.TheoryTotalT2) < 33) {
+                    if ($("#overallGrade").text() === '' || $("#overallGrade").text() === 'D') {
+                        $("#result").text("Fail");
+                        // $("#teacherRemark").hide();
+                    } else {
+                        $("#result").text("Pass");
+                        // $("#promotedClass").text(data.promotedClass);
+
+                    }
+                    data.optionalSubjectDatas.forEach(optionalSubjectData => {
+                        var moralScienceRowUT1 = createAdditionalRow(optionalSubjectData.Subject, getOptionMarkGrade(optionalSubjectData.TheoryMarksPre2), getOptionMarkGrade(optionalSubjectData.PracticalMarksPre2),
+                            getOptionMarkGrade(optionalSubjectData.TotalObtainedMarksPre2), optionalSubjectData.GradePre2, false);
+                        tableBodyPreBoard1.appendChild(moralScienceRowUT1);
+                    });
+
+
+                }
+
+            } else {
+                console.log("Invalid API response format");
+            }
+        })
+        .catch(error => {
+            console.log("API call failed: " + error);
+        });
+}
+
+
+
+
+
+
+function getOptionMarkGrade(gradeNumber) {
+    if (gradeNumber === -1) {
+        return "AB";
+    } else if (gradeNumber === -2) {
+        return "-";
+    } else if (gradeNumber < 1 || gradeNumber > 4) {
+        return "D";
+    }
+
+    var grade = String.fromCharCode('A'.charCodeAt(0) + (gradeNumber - 1));
+    return grade;
+}
+
+
+function generatePDF() {
+    // Create a new jsPDF instance
+    var doc = new jsPDF();
+
+    // Get the content of the specific <div> to be printed
+    var content = document.getElementById("canvas").innerHTML;
+
+    // Add the content to the PDF document
+    doc.fromHTML(content, 15, 15);
+
+    // Get the current date
+    var currentDate = new Date();
+
+    // Format the date as "YYYY-MM-DD" (adjust as needed)
+    var formattedDate = currentDate.toISOString().split('T')[0];
+
+    // Save the PDF with a filename including the dynamic date
+    doc.save("document_" + formattedDate + ".pdf");
+}
+
+
+
+///
+
+
+$(document).ready(function () {
+
+    callReportPDF();
+
+    // setTimeout(createAllPrint, 5000 * numbers1.length);
+})
+
+function callReportPDF() {
+    const numbersString1 = localStorage.getItem("PrintIds"); // Retrieve the string from localStorage
+    const numbers1 = JSON.parse(numbersString1);
+    processNumbers();
+}
+async function createAllPrint() {
+    const urlParam = new URLSearchParams(window.location.search);
+    const id = urlParam.get('id');
+
+    try {
+        const response = await fetch('/Exam/GetEncodedContent?id=' + id);
+        const data = await response.json();
+        console.log(data);
+        // const keysInOriginalOrder = [171, 209, 173, 175, 216]; // Replace with your desired order
+        const numbersString1 = localStorage.getItem("PrintIds"); // Retrieve the string from localStorage
+        const numbers1 = JSON.parse(numbersString1);
+        var keysInOriginalOrder = [];
+
+        // Loop through each object in the data array and extract StudentId
+        for (var i = 0; i < numbers1.length; i++) {
+            var studentId = numbers1[i].StudentId;
+            keysInOriginalOrder.push(studentId);
+        }
+        console.log(keysInOriginalOrder);
+        const jsonData = JSON.parse(data);
+        console.log(jsonData);
+
+        $('#printColumns').empty();
+
+        const keysInOrder = Object.keys(jsonData);
+        console.log(keysInOrder);
+        for (const key of keysInOriginalOrder) {
+            if (jsonData.hasOwnProperty(key)) {
+                const content = jsonData[key];
+                const htmlContent = atob(content);
+
+                $('#printColumns').append(htmlContent);
+                await processNextKey(); // Optional delay if needed
+            }
+        }
+
+        document.getElementById("loader-overlay").style.display = "none";
+    } catch (error) {
+        console.error(error);
+    }
+}
+var test = [];
+var parentDiv;
+async function processNumbers() {
+
+    document.getElementById("loader-overlay").style.display = "flex";
+    const numbersString = localStorage.getItem("PrintIds"); // Retrieve the string from localStorage
+    const numbers = JSON.parse(numbersString); // Parse the string into an array
+    parentDiv = document.createElement('div');
+    parentDiv.classList.add('cls1');
+    for (const { rollno, StudentId } of numbers) {
+        const data = await fetchData(rollno, StudentId);
+        console.log(StudentId)
+        //    // Your code to process 'data' for each rollno and studentId
+        //}
+        //    for (const number of numbers) {
+        //        const data = await fetchData(number);
+        // Perform other operations using the fetched data
+        // ...
+
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Introduce a delay
+        // Call your function to create JSON
+        Creatjson(StudentId);
+        break
+    }
+    pdf();
+    console.log(test)
+
+    //generatePdf1('1')
+    //multiplePDF()
+    // await createPdf()
+
+}
+//setInterval(Creatjson(), 2000);
+function Creatjson(studentId) {
+    const divContent = $('#JsonPrint').html();
+    $('#printColumns').empty();
+    $('#printColumns').append(divContent);
+    document.getElementById("loader-overlay").style.display = "none";
+    //var x = document.createElement('div');
+    //x.classList.add('cls');
+    document.querySelector('#printT').classList.add("test")
+    parentDiv.appendChild(document.querySelector('#printT').cloneNode(true));
+    //parentDiv.appendChild(x.cloneNode(true));
+    //test.push(x);
+    // generatePdf1(studentId);
+
+}
+
+
+function generatePdf1(studentId) {
+    debugger
+    window.jsPDF = window.jspdf.jsPDF;
+    const divContent = $('#JsonPrint');
+    divContent.empty();
+    console.log(divContent)
+    divContent.append(parentDiv);
+    //let jsPdf = new jsPDF('p', 'pt', 'a6');
+    let jsPdf = new jsPDF('p', 'pt', [610, 900])
+    var fileName = "Result" + studentId;
+    var htmlElement = divContent.html();//document.querySelector('.cls1');
+    // console.log(htmlElement)
+    // you need to load html2canvas (and dompurify if you pass a string to html)
+    const opt = {
+        callback: function (jsPdf) {
+
+            jsPdf.save(fileName);
+            // to open the generated PDF in browser window
+            // window.open(jsPdf.output('bloburl'));
+        },
+        margin: [0, 0, 0, 0],
+        autoPaging: 'text',
+        html2canvas: {
+            allowTaint: true,
+            dpi: 300,
+            letterRendering: true,
+            logging: false,
+            scale: .8
+        }
+    };
+    jsPdf.html(htmlElement, opt);
+}
+
+
+function createHead() {
+    var head = ` <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Neuton:wght@300;400;700&display=swap"
+              rel="stylesheet" />
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+        <style>
+
+            #printT {
+                border: 1px solid #ccc;
+                padding: 20px;
+                margin: 20px;
+                width: 7.5in;
+                height: 11in;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                page-break-after: always;
+            }
+
+            #loader-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .loader {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3498db;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 2s linear infinite;
+            }
+
+            @@keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+        <style>
+	        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .ft10 {
+            font-size: 11px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft11 {
+            font-size: 34px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft12 {
+            font-size: 15px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft13 {
+            font-size: 20px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft14 {
+            font-size: 11px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft15 {
+            font-size: 12px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft16 {
+            font-size: 16px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .ft17 {
+            font-size: 12px;
+            line-height: 17px;
+            font-family: Times;
+            color: #333333;
+        }
+
+        .headerTermColumn {
+            width: 80px !important;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 0.2px solid #00000067;
+            border-collapse: collapse;
+        }
+
+        .signature {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        @media print {
+            .ft11 {
+                font-size: 23px; /* Font size for printing */
+            }
+
+            .ft13 {
+                font-size: 16px;
+            }
+        }
+html, body { margin: 0; padding: 0; }
+
+	        </style>
+    </head>
+    <body style="overflow: hidden" >
+        <div id="loader-overlay">
+            <div class="loader"></div>
+        </div>`
+
+    return head;
+}
+
+function createScript() {
+    var script = `<script src="https://code.jquery.com/jquery-3.7.0.slim.js" integrity="sha256-7GO+jepT9gJe9LB4XFf8snVOjX3iYNb0FHYr5LI1N5c=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        <script src="~/Scripts/DevelopmentJS/PrintReport.js"></script>
+`
+
+    return script;
+}
+function pdf() {
+    //debugger
+    //var source = window.document.getElementById("exportPdf").innerHTML;
+    //var opt = {
+    //    margin: 1,
+    //    filename: 'myfile.pdf',
+    //    image: { type: 'jpeg', quality: 0.98 },
+    //    html2canvas: {
+    //        allowTaint: true,
+    //        dpi: 600,
+    //        letterRendering: true,
+    //        logging: false,
+    //        scale: .98 },
+    //    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    //};
+    //html2pdf().set(opt).from(source).save();
+    var linkArry = [
+        "https://code.jquery.com/jquery-3.7.0.slim.js",
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js",
+        "https://html2canvas.hertzen.com/dist/html2canvas.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+    ]
+
+    var chtml = document.createElement('html')
+    chtml.appendChild(document.createElement('head'))
+    chtml.appendChild(document.createElement('body'))
+    const header = $.parseHTML(createHead());
+    const footer = $.parseHTML(createScript());
+    for (i = 0; i < header.length; i++) {
+        chtml.children[0].append(header[i])
+    }
+    window.html2pdf = window.html2pdf;
+    const divContent = $('#JsonPrint');
+
+    divContent.empty();
+    divContent.append(parentDiv);
+    chtml.children[1].append(parentDiv)
+
+    for (i = 0; i < linkArry.length; i++) {
+        createSpt = document.createElement('script');
+        createSpt.setAttribute("src", linkArry[i]);
+        chtml.children[1].append(createSpt)
+    }
+    var getDivContent = chtml;
+    var element = getDivContent;
+    var settings = {
+        "url": "/Exam/DownloadPdf",
+        "method": "POST",
+        "headers": {
+            "Content-Type": "application/json;charset=UTF-8"
+        },
+        "data": JSON.stringify({ htmlContent: chtml.outerHTML })
+    };
+
+    $.ajax(settings).done(function (response) {
+        const url = window.URL.createObjectURL(new Blob([response]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'some_file_name.pdf');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        ///window.location.href = response;
+    });
+
+    //$.ajax({
+    //    url: "/Exam/DownloadPdf",
+    //    type: "POST",
+    //    dataType: "json",
+    //    contentType: "application/json;charset=UTF-8",
+    //    data: JSON.stringify( { htmlContent: chtml.outerHTML }),
+    //    success: function (result) {
+    //        console.log(result);
+    //        window.location.href = result;
+           
+    //    },
+    //    error: function (errormessage) {
+    //        console.log("Error:", errormessage); // Log any error message
+    //        alert(errormessage.responseText);
+    //    }
+    //});
+
+    //var opt = {
+    //    margin: [0, 0, 0, 0],
+    //    filename: 'myfile.pdf',
+    //    autoPaging: 'text',
+    //    image: { type: 'jpeg', quality: 1 },
+    //    html2canvas: {
+    //        allowTaint: true,
+    //        dpi: 300,
+    //        letterRendering: true,
+    //        logging: false,
+    //        scale: .98
+    //    },
+    //    pagebreak: {  before: '.test' },
+    //    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    //};
+    ////[610, 900]
+    //// New Promise-based usage:
+    ////html2pdf().set(opt).from(element).save();
+
+    //// Old monolithic-style usage:
+    //html2pdf(element, opt);
+}
+
+//async function createPdf() {
+//    window.PDFDocument = PDFLib.PDFDocument;
+//    const pdfDoc =await PDFDocument.create();
+//    console.log(pdfDoc)
+
+//    const page = pdfDoc.addPage()
+//    //page.html('<b>strong</b>')
+//    page.drawText('<p>You can create PDFs!</p>')
+//    const pdfBytes = await pdfDoc.save()
+//    console.log(pdfBytes)
+//    var file = new Blob([pdfBytes], { type: 'application/pdf' });
+//    var fileURL = URL.createObjectURL(file);
+//    window.open(fileURL);
+//}
+
+function multiplePDF() {
+    window.jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF('p', 'pt', [580, 630]);
+    for (let i = 0; i < test.length; i++) {
+        console.log(test[i])
+
+        html2canvas(test[i], {
+            onrendered: function (canvas) {
+                document.body.appendChild(canvas);
+                var ctx = canvas.getContext('2d');
+                var imgData = canvas.toDataURL("image/png", 1.0);
+                var htmlH = test[i];
+                var width = canvas.width;[0][0]
+                var height = canvas.clientHeight;
+                pdf.addPage(580, htmlH);
+                pdf.addImage(imgData, 'PNG', 20, 20, (width - 10), (height));
+            }
+        });
+    }
+
+    //html2canvas($(".page2")[0], {
+    //    allowTaint: true,
+    //    onrendered: function (canvas) {
+    //        var ctx = canvas.getContext('2d');
+    //        var imgData = canvas.toDataURL("image/png", 1.0);
+    //        var htmlH = $(".page2").height() + 100;
+    //        var width = canvas.width;
+    //        var height = canvas.clientHeight;
+    //        pdf.addPage(580, htmlH);
+    //        pdf.addImage(imgData, 'PNG', 20, 20, (width - 40), (height));
+    //    }
+    //});
+    //html2canvas($(".page3")[0], {
+    //    allowTaint: true,
+    //    onrendered: function (canvas) {
+    //        var ctx = canvas.getContext('2d');
+    //        var imgData = canvas.toDataURL("image/png", 1.0);
+    //        var htmlH = $(".page2").height() + 100;
+    //        var width = canvas.width;
+    //        var height = canvas.clientHeight;
+    //        pdf.addPage(580, htmlH);
+    //        pdf.addImage(imgData, 'PNG', 20, 20, (width - 40), (height));
+    //    }
+    //});
+    pdf.save('sample.pdf');
+    setTimeout(function () {
+
+        //jsPDF code to save file
+
+    }, 0);
+}
+
+async function processNextKey() {
+    return new Promise(resolve => {
+        setTimeout(resolve, 1000); // Adjust the delay as needed
+    });
+}
+
+
+
+function splitValue(value) {
+
+    if (/^UT\d+$/.test(value)) {
+        const name = value.substring(0, 2);
+        const id = value.substring(2);
+        return { name, id };
+    }
+
+    else if (/^Term\d+$/.test(value)) {
+        const name = value.substring(0, 4);
+        const id = value.substring(4);
+        return { name, id };
+    }
+    else if (/^PreBoard\d+$/.test(value)) {
+        const name = value.substring(0, 8);
+        const id = value.substring(8);
+        return { name, id };
+    }
+    else if (/^All\d+$/.test(value)) {
+        const name = value.substring(0, 3);
+        const id = value.substring(3);
+        return { name, id };
+    }
+    else {
+        return null;
+    }
+}
+//check zero in data
+
+// Function to check if the value is 0, then return "-"
+function checkForZero(value) {
+    if (value === -1) {
+        return "AB";
+    } else if (value === -2) {
+        return "-";
+    } else {
+        return value;
+    }
+}
+
+// Function to create an additional row with given values
+function createAdditionalRow(...data) {
+    var newRow = document.createElement('tr');
+    var IsBold = data.pop();
+    // Create the "subject" <td> with "scope" and "class" attributes
+    var subjectTd = document.createElement('td');
+    subjectTd.textContent = data[0]; // First parameter is the subject
+    subjectTd.setAttribute('scope', 'row');
+    subjectTd.setAttribute('class', 'text-uppercase text-start ps-1');
+    newRow.appendChild(subjectTd);
+
+    // Loop through the data starting from the second parameter (index 1)
+    for (var i = 1; i < data.length; i++) {
+        addDataToRow(newRow, data[i], IsBold);
+    }
+
+    return newRow;
+}
+
+function addDataToRow(row, data, isBold) {
+    var td = document.createElement('td');
+    if (isBold) {
+        var boldElement = document.createElement('b');
+        boldElement.textContent = data;
+        td.appendChild(boldElement);
+    } else {
+        td.textContent = data;
+    }
+    row.appendChild(td);
+}
+function PercentageCal(obtainedMarks, totalMarks) {
+
+    var a = (obtainedMarks / totalMarks) * 100;
+    return a.toFixed(2);
+}
+
+function GetGrade(percentage) {
+    //    fetch('/Exam/GetGradeByPercentage?percentage=' + percentage, {
+    //        method: 'GET',
+    //        headers: {
+    //            'Content-Type': 'application/json'
+    //        }
+    //    })
+    //        .then(response => response.json())
+    //        .then(data => {
+    //            console.log(data, data.Grade);
+    //            return data.Grade;
+
+
+    //})
+    //        .catch(error => {
+    //            return "F";
+    //    console.log("API call failed: " + error);
+    //});
+    fetch('/Exam/AllGrade', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+
+            gradingCriteria = data;
+            var matchingGrades = gradingCriteria.filter(function (g) {
+                return percentage >= g.MinimumPercentage && percentage <= g.MaximumPercentage;
+            });
+
+            if (matchingGrades.length > 0) {
+                return matchingGrades[0].Grade;
+            } else {
+                // If no matching grade found, you can return a default grade or null
+                return "F";
+            }
+            // Call getGradeByPercentage function here after the API call is complete and gradingCriteria is populated
+            //return getGradeByPercentage(percentage);
+        })
+        .catch(error => {
+            console.log("API call failed: " + error);
+        });
+}
+
+
+function getGradeByPercentage(percentage) {
+    var matchingGrades = gradingCriteria.filter(function (g) {
+        return percentage >= g.MinimumPercentage && percentage <= g.MaximumPercentage;
+    });
+
+    if (matchingGrades.length > 0) {
+        return matchingGrades[0].Grade;
+    } else {
+        // If no matching grade found, you can return a default grade or null
+        return "F";
+    }
+}
+
+
+
+function addRows(rowData, Term) {
+    //add coscholastic area
+    //const rowData = [
+    //    // Sample data - add more records as needed
+    //    { "Name": "Subject 1", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 2", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 3", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 4", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 5", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 6", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 7", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 8", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 9", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 10", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 11", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 12", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 13", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 14", "GradeTerm1": "A", "GradeTerm2": "B" },
+    //    { "Name": "Subject 15", "GradeTerm1": "A", "GradeTerm2": "B" }
+    //];
+    // Get the table reference
+    const table = document.getElementById("coScholasticTable");
+    const rows = table.getElementsByTagName("tr");
+
+    // Loop through the rows in reverse order to avoid issues with removing elements while iterating
+    for (let i = rows.length - 1; i >= 0; i--) {
+        const row = rows[i];
+
+        // Check if the row contains <th> elements
+        if (row.getElementsByTagName("th").length === 0) {
+            // If it doesn't contain <th> elements, remove the row
+            row.remove();
+        }
+    }
+    const totalRecords = rowData.length;
+    const pairs = Math.ceil(totalRecords / 2);
+
+    for (let i = 0; i < pairs; i++) {
+        const data1 = rowData[i * 2];
+        const data2 = rowData[i * 2 + 1];
+
+        const row = createRow(data1, data2, Term);
+        table.appendChild(row);
+    }
+}
+
+function createRow(data1, data2, Term) {
+    const row = document.createElement("tr");
+    row.classList.add("custom-row");
+
+    const createCell = (text, isHeader = false) => {
+        const cell = isHeader ? document.createElement("td") : document.createElement("td");
+        cell.textContent = text;
+        cell.scope = "row";
+        return cell;
+    };
+
+    // First set of columns
+    if (data1) {
+        row.appendChild(createCell(data1.Name, true)).classList.add("text-start", "ps-1");
+        if (Term == 3) {
+            row.appendChild(createCell(data1.GradeTerm1));
+        }
+        else if (Term == 4) {
+            row.appendChild(createCell(data1.GradeTerm2));
+        }
+        else if (Term == 7) {
+            row.appendChild(createCell(data1.GradePre1));
+        }
+        else if (Term == 8) {
+            row.appendChild(createCell(data1.GradeTerm2));
+        }
+        else {
+            row.appendChild(createCell(data1.GradeTerm1));
+            row.appendChild(createCell(data1.GradeTerm2));
+            row.appendChild(createCell(data1.GradePre1));
+            row.appendChild(createCell(data1.GradePre2));
+        }
+    } else {
+        row.appendChild(createCell("", true)).classList.add("text-start", "ps-1");
+
+        if (Term == 3) {
+            row.appendChild(createCell(""));
+        }
+        else if (Term == 4) {
+            row.appendChild(createCell(""));
+        }
+        else if (Term == 7) {
+            row.appendChild(createCell(""));
+        }
+        else if (Term == 8) {
+            row.appendChild(createCell(""));
+        }
+        else {
+            row.appendChild(createCell(""));
+            row.appendChild(createCell(""));
+        }
+    }
+
+    // Second set of columns
+    if (data2) {
+        row.appendChild(createCell(data2.Name, true)).classList.add("text-start", "ps-1");
+        if (Term == 3) {
+            row.appendChild(createCell(data1.GradeTerm1));
+        }
+        else if (Term == 4) {
+            row.appendChild(createCell(data1.GradeTerm2));
+        }
+        if (Term == 7) {
+            row.appendChild(createCell(data2.GradePre1));
+        }
+        else if (Term == 8) {
+            row.appendChild(createCell(data1.GradePre2));
+        }
+        else {
+            row.appendChild(createCell(data1.GradeTerm1));
+            row.appendChild(createCell(data1.GradeTerm2));
+            row.appendChild(createCell(data2.GradePre1));
+            row.appendChild(createCell(data2.GradePre2));
+        }
+    } else {
+        row.appendChild(createCell("", true)).classList.add("text-start", "ps-1");
+
+        if (Term == 3) {
+            row.appendChild(createCell(""));
+        }
+        else if (Term == 4) {
+            row.appendChild(createCell(""));
+        }
+        else if (Term == 7) {
+            row.appendChild(createCell(""));
+        }
+        else if (Term == 8) {
+            row.appendChild(createCell(""));
+        }
+        else {
+            row.appendChild(createCell(""));
+            row.appendChild(createCell(""));
+        }
+    }
+
+    return row;
+}
+
+
+
