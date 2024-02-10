@@ -64,3 +64,105 @@
 }
 
 </script>
+
+
+
+
+
+   [HttpPost]
+        public FileResult DownloadPdf(string htmlContent)
+        {
+
+            Byte[] res = null;
+            //using (MemoryStream ms = new MemoryStream())
+            //{
+            //    var pdf = PdfGenerator.GeneratePdf(htmlContent, PageSize.A4);
+            //    pdf.Save(ms);
+            //    res = ms.ToArray();
+            //}
+            var filePath = @"C:\Users\Administrator\Desktop\KcK\SchoolManagement.Website\Rotativa\htmlContent.html";
+          //  System.IO.StreamWriter file = new System.IO.StreamWriter(filePath);
+            //file.WriteLine(htmlContent);
+            // Check if file already exists. If yes, delete it.
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                // Add some text to file
+                Byte[] title = new UTF8Encoding(true).GetBytes(htmlContent);
+                fs.Write(title, 0, title.Length);
+               
+            }
+
+
+
+
+
+            //string htmlString = TxtHtmlCode.Text;
+            //string baseUrl = TxtBaseUrl.Text;
+
+            //string pdf_page_size = DdlPageSize.SelectedValue;
+            //PdfPageSize pageSize = (PdfPageSize)Enum.Parse(typeof(PdfPageSize),
+            //    pdf_page_size, true);
+
+            //string pdf_orientation = DdlPageOrientation.SelectedValue;
+            //PdfPageOrientation pdfOrientation =
+            //    (PdfPageOrientation)Enum.Parse(typeof(PdfPageOrientation),
+            //    pdf_orientation, true);
+
+            //int webPageWidth = 1024;
+            //try
+            //{
+            //    webPageWidth = Convert.ToInt32(TxtWidth.Text);
+            //}
+            //catch { }
+
+            //int webPageHeight = 0;
+            //try
+            //{
+            //    webPageHeight = Convert.ToInt32(TxtHeight.Text);
+            //}
+            //catch { }
+
+            //int webPageHeight = 0;
+            HtmlToPdf converter = new HtmlToPdf();
+
+            // set converter options
+            converter.Options.PdfPageSize = PdfPageSize.A4;
+            converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+            //converter.Options.WebPageWidth = ;
+            //converter.Options.WebPageHeight = webPageHeight;
+
+            // create a new pdf document converting an url
+            SelectPdf.PdfDocument doc = converter.ConvertUrl(filePath);
+
+            // save pdf document
+            byte[] pdf = doc.Save();
+
+            // close pdf document
+            doc.Close();
+
+            // return resulted pdf document
+            FileResult fileResult = new FileContentResult(pdf, "application/pdf");
+            fileResult.FileDownloadName = "Document.pdf";
+            //return fileResult;
+            string OUTPUT_FOLDER = @"C:\Users\Administrator\Desktop\KcK\SchoolManagement.Website\Rotativa\";
+            string pdfDest = OUTPUT_FOLDER + "output.pdf";
+            using (FileStream fs = new FileStream(pdfDest, FileMode.Create))
+            {
+                // Add some text to file
+                Byte[] title = pdf;//new UTF8Encoding(true).GetBytes(htmlContent);
+                fs.Write(title, 0, title.Length);
+
+            }
+            //file.Close();
+            
+            //ConverterProperties converterProperties = new ConverterProperties();
+            //HtmlConverter.ConvertToPdf(htmlContent, new FileStream(pdfDest, FileMode.Create), converterProperties);
+
+            return fileResult;
+        }
+
